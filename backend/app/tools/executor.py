@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool
 from pydantic import ValidationError
 
@@ -17,10 +18,12 @@ def _format_validation(exc: ValidationError) -> str:
     return "Invalid arguments - " + "; ".join(parts)
 
 
-def run_tool(tool: BaseTool, args: dict[str, Any]) -> ToolResult:
+def run_tool(
+    tool: BaseTool, args: dict[str, Any], config: RunnableConfig | None = None
+) -> ToolResult:
     """Validate ``args`` against the tool schema, run it and normalise the outcome."""
     try:
-        result = tool.invoke(args)
+        result = tool.invoke(args, config=config)
     except ValidationError as exc:
         return ToolResult.failure(_format_validation(exc))
     except RepositoryError as exc:
