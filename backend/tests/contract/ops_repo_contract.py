@@ -117,6 +117,10 @@ class OpsRepositoryContract:
         assert task.status is TaskStatus.REJECTED and task.decision_note == "use boats instead"
         assert repo.get_stock(ResourceType.DRINKING_WATER, "DEP-A")[0].reserved == 0
 
+    def test_record_rejection_unknown_team_raises(self, repo: OpsRepository) -> None:
+        with pytest.raises(NotFoundError):
+            repo.record_rejection(make_plan(team_id="TM-99"))
+
     def test_task_ids_increment(self, repo: OpsRepository) -> None:
         a = repo.record_rejection(make_plan())
         b = repo.record_rejection(make_plan())

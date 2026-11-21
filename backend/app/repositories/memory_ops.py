@@ -123,6 +123,10 @@ class InMemoryOpsRepository:
         self, plan: ReliefPlan, note: str = "", thread_id: str | None = None
     ) -> DispatchTask:
         with self._lock:
+            if plan.ward_id not in self._wards:
+                raise NotFoundError(f"Unknown ward {plan.ward_id}")
+            if plan.team_id not in self._teams:
+                raise NotFoundError(f"Unknown team {plan.team_id}")
             return self._add_task(plan, TaskStatus.REJECTED, note, thread_id)
 
     def reset(self) -> None:
