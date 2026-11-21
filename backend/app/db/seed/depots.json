@@ -1,0 +1,95 @@
+[
+  {
+    "id": "DEP-A",
+    "name": "Hilltop Depot",
+    "zone": "north",
+    "stock": [
+      {
+        "resource": "drinking_water",
+        "quantity": 800
+      },
+      {
+        "resource": "food_ration",
+        "quantity": 400
+      },
+      {
+        "resource": "medicine_kit",
+        "quantity": 40
+      },
+      {
+        "resource": "boat",
+        "quantity": 2
+      },
+      {
+        "resource": "shelter_kit",
+        "quantity": 60
+      },
+      {
+        "resource": "blanket",
+        "quantity": 300
+      }
+    ]
+  },
+  {
+    "id": "DEP-B",
+    "name": "Central Market Depot",
+    "zone": "central",
+    "stock": [
+      {
+        "resource": "drinking_water",
+        "quantity": 1500
+      },
+      {
+        "resource": "food_ration",
+        "quantity": 600
+      },
+      {
+        "resource": "medicine_kit",
+        "quantity": 50
+      },
+      {
+        "resource": "boat",
+        "quantity": 4
+      },
+      {
+        "resource": "shelter_kit",
+        "quantity": 100
+      },
+      {
+        "resource": "blanket",
+        "quantity": 500
+      }
+    ]
+  },
+  {
+    "id": "DEP-C",
+    "name": "Harbour Depot",
+    "zone": "coastal",
+    "stock": [
+      {
+        "resource": "drinking_water",
+        "quantity": 600
+      },
+      {
+        "resource": "food_ration",
+        "quantity": 250
+      },
+      {
+        "resource": "medicine_kit",
+        "quantity": 30
+      },
+      {
+        "resource": "boat",
+        "quantity": 6
+      },
+      {
+        "resource": "shelter_kit",
+        "quantity": 40
+      },
+      {
+        "resource": "blanket",
+        "quantity": 200
+      }
+    ]
+  }
+]

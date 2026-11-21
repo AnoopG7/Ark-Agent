@@ -1,0 +1,74 @@
+[
+  {
+    "id": "W-01",
+    "name": "Ward 1",
+    "population": 4200,
+    "zone": "north"
+  },
+  {
+    "id": "W-02",
+    "name": "Ward 2",
+    "population": 3900,
+    "zone": "north"
+  },
+  {
+    "id": "W-03",
+    "name": "Ward 3",
+    "population": 5100,
+    "zone": "north"
+  },
+  {
+    "id": "W-04",
+    "name": "Ward 4",
+    "population": 2800,
+    "zone": "central"
+  },
+  {
+    "id": "W-05",
+    "name": "Ward 5",
+    "population": 6100,
+    "zone": "central"
+  },
+  {
+    "id": "W-06",
+    "name": "Ward 6",
+    "population": 3300,
+    "zone": "central"
+  },
+  {
+    "id": "W-07",
+    "name": "Ward 7",
+    "population": 4700,
+    "zone": "riverside"
+  },
+  {
+    "id": "W-08",
+    "name": "Ward 8",
+    "population": 3600,
+    "zone": "riverside"
+  },
+  {
+    "id": "W-09",
+    "name": "Ward 9",
+    "population": 2500,
+    "zone": "lowland"
+  },
+  {
+    "id": "W-10",
+    "name": "Ward 10",
+    "population": 3100,
+    "zone": "lowland"
+  },
+  {
+    "id": "W-11",
+    "name": "Ward 11",
+    "population": 4400,
+    "zone": "coastal"
+  },
+  {
+    "id": "W-12",
+    "name": "Ward 12",
+    "population": 3800,
+    "zone": "coastal"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "RT-01",
+    "name": "Ridge Road",
+    "depot_id": "DEP-A",
+    "ward_id": "W-07",
+    "status": "open",
+    "travel_minutes": 75,
+    "vehicle": "truck",
+    "note": "Longer hill route, dry and passable."
+  },
+  {
+    "id": "RT-02",
+    "name": "North Link",
+    "depot_id": "DEP-A",
+    "ward_id": "W-03",
+    "status": "open",
+    "travel_minutes": 40,
+    "vehicle": "truck",
+    "note": ""
+  },
+  {
+    "id": "RT-03",
+    "name": "Kallar Bridge Road",
+    "depot_id": "DEP-B",
+    "ward_id": "W-07",
+    "status": "blocked",
+    "travel_minutes": 30,
+    "vehicle": "truck",
+    "note": "Kallar bridge submerged since 04:00."
+  },
+  {
+    "id": "RT-04",
+    "name": "Canal Waterway",
+    "depot_id": "DEP-B",
+    "ward_id": "W-09",
+    "status": "open",
+    "travel_minutes": 50,
+    "vehicle": "boat",
+    "note": "Road access flooded; boats only."
+  },
+  {
+    "id": "RT-05",
+    "name": "Market Bypass",
+    "depot_id": "DEP-C",
+    "ward_id": "W-07",
+    "status": "slow",
+    "travel_minutes": 120,
+    "vehicle": "truck",
+    "note": "Waterlogging near fish market; single lane."
+  },
+  {
+    "id": "RT-06",
+    "name": "Coastal Highway",
+    "depot_id": "DEP-C",
+    "ward_id": "W-12",
+    "status": "open",
+    "travel_minutes": 35,
+    "vehicle": "truck",
+    "note": ""
+  }
+]

@@ -1,0 +1,93 @@
+[
+  {
+    "id": "TM-01",
+    "name": "Alpha Logistics",
+    "skills": [
+      "logistics"
+    ],
+    "size": 8,
+    "status": "available",
+    "base_depot": "DEP-A",
+    "vehicle": "truck"
+  },
+  {
+    "id": "TM-02",
+    "name": "Bravo Supply",
+    "skills": [
+      "logistics",
+      "shelter"
+    ],
+    "size": 10,
+    "status": "available",
+    "base_depot": "DEP-B",
+    "vehicle": "truck"
+  },
+  {
+    "id": "TM-03",
+    "name": "Coral Boat Crew",
+    "skills": [
+      "boat_rescue"
+    ],
+    "size": 6,
+    "status": "available",
+    "base_depot": "DEP-B",
+    "vehicle": "boat"
+  },
+  {
+    "id": "TM-04",
+    "name": "Delta Medics",
+    "skills": [
+      "medical"
+    ],
+    "size": 5,
+    "status": "available",
+    "base_depot": "DEP-A",
+    "vehicle": "truck"
+  },
+  {
+    "id": "TM-05",
+    "name": "Echo River Medics",
+    "skills": [
+      "medical",
+      "boat_rescue"
+    ],
+    "size": 6,
+    "status": "deployed",
+    "base_depot": "DEP-C",
+    "vehicle": "boat"
+  },
+  {
+    "id": "TM-06",
+    "name": "Falcon Haulers",
+    "skills": [
+      "logistics"
+    ],
+    "size": 7,
+    "status": "available",
+    "base_depot": "DEP-C",
+    "vehicle": "truck"
+  },
+  {
+    "id": "TM-07",
+    "name": "Gull Shelter Unit",
+    "skills": [
+      "shelter"
+    ],
+    "size": 9,
+    "status": "resting",
+    "base_depot": "DEP-C",
+    "vehicle": "truck"
+  },
+  {
+    "id": "TM-08",
+    "name": "Heron Boat Logistics",
+    "skills": [
+      "boat_rescue",
+      "logistics"
+    ],
+    "size": 6,
+    "status": "available",
+    "base_depot": "DEP-C",
+    "vehicle": "boat"
+  }
+]
