@@ -1,6 +1,6 @@
 """Pure, validated domain models for the relief operation (no I/O)."""
 
-from app.domain.depot import Depot, StockItem
+from app.domain.depot import Depot, StockItem, StockLevel
 from app.domain.enums import (
     RESOURCE_UNITS,
     FactKind,
@@ -36,6 +36,7 @@ __all__ = [
     "Route",
     "RouteStatus",
     "StockItem",
+    "StockLevel",
     "TaskStatus",
     "Team",
     "TeamSkill",

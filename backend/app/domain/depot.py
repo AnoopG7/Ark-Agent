@@ -48,3 +48,15 @@ class Depot(DomainModel):
 
     def item(self, resource: ResourceType) -> StockItem | None:
         return next((s for s in self.stock if s.resource is resource), None)
+
+
+class StockLevel(DomainModel):
+    """Read model: one resource's stock at one depot, as returned to the agent."""
+
+    depot_id: DepotId
+    depot_name: NonEmptyStr
+    resource: ResourceType
+    unit: Unit
+    quantity: NonNegativeInt
+    reserved: NonNegativeInt
+    available: NonNegativeInt
