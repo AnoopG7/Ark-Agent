@@ -44,10 +44,10 @@ Development setup, tests and demos are in [docs/setup.md](docs/setup.md).
 | 2. LangGraph graph with reasoning, tool and finalisation nodes; diagram and edges explained | `app/agent/graph.py`, `nodes.py`, `routing.py` | [docs/graph.md](docs/graph.md), `tests/unit/test_graph.py` |
 | 3. Short-term memory (checkpointer) and long-term store persisting across restarts | `app/memory/` | [docs/memory.md](docs/memory.md), `scripts/demo_memory_persistence.py`, `tests/integration/test_memory_persistence.py` |
 | 4. Human-in-the-loop interrupt before dispatch; pause and resume | `AgentNodes.approval` | `scripts/demo_approval.py`, dashboard approval slip |
-| 5. ≥ 6 scenarios incl. blocked road, insufficient stock, step limit, with traces | `app/evaluation/scenarios.py` (8 scenarios) | [docs/traces/](docs/traces/) |
-| 6. Evaluate plan validity, steps, unnecessary tool calls; discuss a failure | `app/evaluation/metrics.py`, `app/agent/validator.py` | [docs/evaluation.md](docs/evaluation.md) |
+| 5. ≥ 6 scenarios incl. blocked road, insufficient stock, step limit, with traces | `app/evaluation/scenarios.py` (8 scenarios) | `docs/traces/` *(pending the Groq run)* |
+| 6. Evaluate plan validity, steps, unnecessary tool calls; discuss a failure | `app/evaluation/metrics.py`, `app/agent/validator.py` | evaluation report *(pending the Groq run)* |
 | Extension: RAG with citations | `app/rag/`, `app/knowledge/` | [docs/rag.md](docs/rag.md) |
-| Extension: dashboard | `frontend/` | screenshots below |
+| Extension: dashboard | `frontend/` | <http://localhost:8080> |
 
 ## Repository layout
 
@@ -66,7 +66,7 @@ docs/       design, architecture, graph, memory, RAG, database, API, evaluation,
 - [Design document](docs/design/ark-agent-design.md) and [implementation plan](docs/design/ark-agent-implementation-plan.md)
 - [Architecture](docs/architecture.md) · [Agent graph](docs/graph.md) · [Memory](docs/memory.md) · [RAG](docs/rag.md)
 - [Database](docs/database.md) · [Tools and schemas](docs/tools-and-schemas.md) · [HTTP API](docs/api.md)
-- [Setup](docs/setup.md) · [Evaluation](docs/evaluation.md)
+- [Setup](docs/setup.md) · Evaluation *(pending the Groq run)*
 
 ## Tests
 

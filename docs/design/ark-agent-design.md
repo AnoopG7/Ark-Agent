@@ -100,52 +100,39 @@ strong typed schemas, tests, documentation, an evaluation report, and a readable
 
 ## 6. Detailed design
 
-### 6.1 Folder structure
+### 6.1 Folder structure (as built)
 
 ```
 Ark-Agent/
-├── README.md                      # quick start, screenshots, PDF task → file map
-├── PS.pdf
-├── docker-compose.yml             # db (pgvector), backend, frontend
-├── .gitignore  .env.example
-├── backend/
-│   ├── Dockerfile                 # uv-based image
-│   ├── pyproject.toml  uv.lock  alembic.ini
-│   ├── migrations/                # Alembic: tables + pgvector extension
+├── README.md  PS.pdf  docker-compose.yml  .env.example  .gitignore
+├── backend/                       # uv project (pyproject.toml, uv.lock), Dockerfile
+│   ├── alembic.ini  migrations/   # Alembic: enums, tables, pgvector extension + HNSW index
 │   ├── app/
-│   │   ├── core/                  # config.py (pydantic-settings), logging.py
-│   │   ├── domain/                # pure Pydantic models + enums (no I/O)
-│   │   │   ├── enums.py  depot.py  route.py  team.py  task.py  request.py  plan.py  memory.py
-│   │   ├── db/
-│   │   │   ├── base.py  session.py  models.py      # SQLAlchemy 2.0 ORM tables
-│   │   │   └── seed/                                # depots.json routes.json teams.json wards.json + seeder.py
-│   │   ├── repositories/
-│   │   │   ├── interfaces.py      # OpsRepository / VectorIndex Protocols
-│   │   │   ├── sql_ops.py  memory_ops.py           # Postgres + in-memory (tests) implementations
-│   │   ├── knowledge/             # RAG corpus: 8–10 SOP markdown files
-│   │   ├── rag/
-│   │   │   ├── chunker.py  embeddings.py  pgvector_index.py  memory_index.py  ingest.py  retriever.py
-│   │   ├── memory/                # checkpointer + long-term store factories, fact helpers
-│   │   ├── tools/
-│   │   │   ├── stock.py  roads.py  teams.py  dispatch.py  guidelines.py  memory_tools.py  registry.py
-│   │   ├── agent/
-│   │   │   ├── state.py  prompts.py  llm.py  nodes.py  routing.py  graph.py  validator.py
-│   │   ├── api/
-│   │   │   ├── main.py  deps.py  schemas.py  streaming.py
-│   │   │   └── routers/ threads.py  ops.py  memory.py  graph.py
-│   │   └── evaluation/            # scenarios.py  runner.py  metrics.py  report.py
-│   ├── scripts/                   # demo_memory_persistence.py  demo_approval.py  export_graph.py
-│   └── tests/
-│       ├── unit/                  # offline: in-memory repos + fake LLM
-│       └── integration/           # against Postgres (docker compose), marked `integration`
-├── frontend/                      # Vite + React + TypeScript + Tailwind; Dockerfile (nginx)
-│   └── src/ api/  components/  hooks/  types/  pages/
-└── docs/
-    ├── design/                    # this document + implementation plan
-    ├── architecture.md  database.md  graph.md  memory.md  rag.md  tools-and-schemas.md
-    ├── api.md  setup.md  evaluation.md
-    └── traces/                    # generated scenario traces
+│   │   ├── core/config.py         # pydantic-settings
+│   │   ├── domain/                # base, enums, ward, depot, route, team, request, plan, task,
+│   │   │                          # memory, results — pure Pydantic, no I/O
+│   │   ├── db/                    # base, models (ORM), session, seeder, seed/*.json + loader
+│   │   ├── repositories/          # interfaces (Protocol), rules, sql_ops, memory_ops, errors
+│   │   ├── knowledge/             # 9 relief SOP markdown files (RAG corpus)
+│   │   ├── rag/                   # types, chunker, embeddings, index, memory_index,
+│   │   │                          # pgvector_index, ingest, retriever
+│   │   ├── memory/                # factory (Postgres/in-memory saver + store), facts service
+│   │   ├── tools/                 # schemas, ops_tools, guidelines, memory_tools, dispatch,
+│   │   │                          # executor (safe run_tool), registry, context
+│   │   ├── agent/                 # state, prompts, llm, policy, validator, nodes, routing,
+│   │   │                          # graph, diagram
+│   │   ├── api/                   # main (factory), container (wiring), deps, schemas,
+│   │   │                          # streaming (SSE), routers/{threads,ops,memory,system}
+│   │   └── evaluation/            # scenarios, runner, metrics, report
+│   ├── scripts/                   # run_eval, demo_approval, demo_memory_persistence, export_graph
+│   └── tests/                     # unit/ (offline), integration/ (Postgres), contract/, fakes
+├── frontend/                      # Vite + React 19 + TypeScript + Tailwind; Dockerfile + nginx.conf
+│   └── src/ api/  components/(ops/)  hooks/  lib/  types/
+└── docs/                          # design/, architecture, database, graph, memory, rag,
+                                   # tools-and-schemas, api, setup, evaluation, traces/
 ```
+
+See [`docs/architecture.md`](../architecture.md) for the layering and request lifecycle.
 
 ### 6.2 Domain schemas (Pydantic v2, `extra="forbid"`, frozen where immutable)
 

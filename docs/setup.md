@@ -70,8 +70,8 @@ uv run python -m scripts.run_eval                 # scenario traces + docs/evalu
 
 ## Troubleshooting
 
-- **`error: GROQ_API_KEY is not set`** in the dashboard: add the key to `.env` and restart the
-  backend (`docker compose restart backend`).
+- **`error: GROQ_API_KEY is not set`** in the dashboard: add the key to `.env` and recreate the
+  backend with `docker compose up -d backend` (`restart` does not re-read `.env`).
 - **Port 5432 already in use**: set `POSTGRES_PORT=5433` in `.env` and update `DATABASE_URL`.
 - **Reset the demo**: *Reset data* in the dashboard (or `POST /api/ops/reset`) restores stock,
   roads and teams; *Clear memory* empties long-term facts. `docker compose down -v` wipes the
