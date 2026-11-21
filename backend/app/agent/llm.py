@@ -34,8 +34,8 @@ def _is_retryable(exc: BaseException) -> bool:
 
 @retry(
     retry=retry_if_exception(_is_retryable),
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=8),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=2, min=2, max=30),
     reraise=True,
 )
 def invoke_with_retry(model, messages: list[BaseMessage]) -> AIMessage:
