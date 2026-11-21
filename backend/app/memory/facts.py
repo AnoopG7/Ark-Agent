@@ -24,7 +24,7 @@ class FactsService:
         if ward_id is not None:
             flt["ward_id"] = ward_id
         if kind is not None:
-            flt["kind"] = kind.value
+            flt["kind"] = FactKind(kind).value
         items = self._store.search(self._ns, filter=flt or None, limit=1000)
         facts = [MemoryFact.model_validate(i.value) for i in items]
         facts.sort(key=lambda f: f.created_at, reverse=True)
