@@ -1,0 +1,142 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-silt: #e6ebe8;
+  --color-silt-deep: #d5ddd9;
+  --color-paper: #f7f9f8;
+  --color-ink: #0f2a3d;
+  --color-ink-soft: #46606f;
+  --color-river: #1f6f78;
+  --color-river-deep: #17545b;
+  --color-river-wash: #d6e9ea;
+  --color-flood: #e0a100;
+  --color-flood-wash: #fbefcc;
+  --color-signal: #b3261e;
+  --color-signal-wash: #f6dcd9;
+  --color-bank: #3c7d4a;
+  --color-bank-wash: #dcebdf;
+
+  --font-display: 'Archivo Variable', system-ui, sans-serif;
+  --font-body: 'Public Sans Variable', system-ui, sans-serif;
+
+  --radius-slip: 2px;
+  --radius-panel: 10px;
+}
+
+@layer base {
+  html {
+    background: var(--color-silt);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-river);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .display {
+    font-family: var(--font-display);
+    font-variation-settings: 'wdth' 112;
+    letter-spacing: -0.01em;
+  }
+
+  .panel {
+    background: var(--color-paper);
+    border: 1px solid var(--color-silt-deep);
+    border-radius: var(--radius-panel);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 6px;
+    padding: 0.45rem 0.9rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background-color 120ms ease;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: var(--color-river);
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-river-deep);
+  }
+
+  .btn-quiet {
+    color: var(--color-ink);
+    border: 1px solid var(--color-silt-deep);
+    background: white;
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--color-silt);
+  }
+
+  .btn-danger {
+    color: var(--color-signal);
+    border: 1px solid var(--color-signal-wash);
+    background: white;
+  }
+
+  .btn-danger:hover:not(:disabled) {
+    background: var(--color-signal-wash);
+  }
+}
+
+/* The waterline: the vertical river the agent's steps sit on. */
+.waterline {
+  position: relative;
+}
+
+.waterline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: linear-gradient(var(--color-river), var(--color-river-wash));
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.slip-enter {
+  animation: rise 260ms ease-out;
+}
