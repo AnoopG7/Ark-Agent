@@ -35,9 +35,9 @@ class Settings(BaseSettings):
     # --- RAG -------------------------------------------------------------------------------
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_dim: int = 384
-    embedding_cache_dir: Path | None = None
+    embedding_cache_dir: Path = BACKEND_DIR / ".fastembed_cache"
     rag_top_k: int = Field(default=3, ge=1, le=10)
-    rag_min_score: float = Field(default=0.35, ge=0.0, le=1.0)
+    rag_min_score: float = Field(default=0.60, ge=0.0, le=1.0)
     knowledge_dir: Path = BACKEND_DIR / "app" / "knowledge"
 
     # --- API -------------------------------------------------------------------------------
