@@ -22,6 +22,7 @@ def build_chat_model(settings: Settings) -> BaseChatModel:
         temperature=settings.llm_temperature,
         timeout=settings.llm_timeout_s,
         max_retries=settings.llm_max_retries,
+        reasoning_effort=settings.llm_reasoning_effort,
     )
 
 

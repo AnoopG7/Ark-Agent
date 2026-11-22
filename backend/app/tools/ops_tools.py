@@ -2,9 +2,15 @@
 
 from langchain_core.tools import BaseTool, StructuredTool
 
+from app.agent.policy import REQUIRED_SKILL
 from app.domain import ResourceType, RouteStatus, TeamSkill, TeamStatus, ToolResult
 from app.tools.context import ToolContext
-from app.tools.schemas import ListTeamsArgs, RoadStatusArgs, StockLookupArgs
+from app.tools.schemas import (
+    ListTeamsArgs,
+    RoadStatusArgs,
+    SituationReportArgs,
+    StockLookupArgs,
+)
 
 
 def build_ops_tools(ctx: ToolContext) -> list[BaseTool]:
@@ -41,7 +47,50 @@ def build_ops_tools(ctx: ToolContext) -> list[BaseTool]:
         teams = repo.list_teams(skill=skill, status=status)
         return ToolResult.success({"teams": [t.model_dump(mode="json") for t in teams]})
 
+    def situation_report(ward_id: str, resource: ResourceType) -> ToolResult:
+        """Everything needed to plan one request, in one compact observation."""
+        ward = repo.get_ward(ward_id)
+        levels = repo.get_stock(resource)
+        routes = sorted(repo.list_routes(ward_id=ward_id), key=lambda r: r.travel_minutes)
+        required = REQUIRED_SKILL.get(resource)
+        teams = repo.list_teams(skill=required, status=TeamStatus.AVAILABLE)
+        return ToolResult.success(
+            {
+                "ward": {"id": ward.id, "name": ward.name, "population": ward.population},
+                "resource": resource,
+                "unit": levels[0].unit if levels else None,
+                "stock": [{"depot_id": lvl.depot_id, "available": lvl.available} for lvl in levels],
+                "total_available": sum(lvl.available for lvl in levels),
+                "routes": [
+                    {
+                        "id": r.id,
+                        "depot_id": r.depot_id,
+                        "status": r.status,
+                        "travel_minutes": r.travel_minutes,
+                        "vehicle": r.vehicle,
+                        "usable": r.status is not RouteStatus.BLOCKED,
+                    }
+                    for r in routes
+                ],
+                "required_skill": required,
+                "available_teams": [
+                    {"id": t.id, "skills": t.skills, "vehicle": t.vehicle} for t in teams
+                ],
+                "message": None if routes else "No route reaches this ward from any depot.",
+            }
+        )
+
     return [
+        StructuredTool.from_function(
+            situation_report,
+            name="situation_report",
+            description=(
+                "One-call overview for planning a request: available stock of the resource per "
+                "depot, every route to the ward (status, time, vehicle, usable) and the available "
+                "teams that can deliver it. Use this first instead of the three separate lookups."
+            ),
+            args_schema=SituationReportArgs,
+        ),
         StructuredTool.from_function(
             stock_lookup,
             name="stock_lookup",

@@ -14,7 +14,13 @@ def tools() -> dict[str, BaseTool]:
 
 
 def test_registry_contents(tools: dict[str, BaseTool]) -> None:
-    assert set(tools) == {"stock_lookup", "road_status", "list_teams", "create_dispatch_task"}
+    assert set(tools) == {
+        "situation_report",
+        "stock_lookup",
+        "road_status",
+        "list_teams",
+        "create_dispatch_task",
+    }
     assert set(APPROVAL_REQUIRED) == {"create_dispatch_task"}
 
 
@@ -88,3 +94,25 @@ def test_dispatch_tool_never_executes_directly(tools: dict[str, BaseTool]) -> No
     }
     res = run_tool(tools["create_dispatch_task"], plan)
     assert not res.ok and "approval" in res.error
+
+
+def test_situation_report_combines_stock_routes_and_teams(tools: dict[str, BaseTool]) -> None:
+    res = run_tool(tools["situation_report"], {"ward_id": "W-07", "resource": "drinking_water"})
+    assert res.ok
+    d = res.data
+    assert d["total_available"] == 2900
+    assert [r["id"] for r in d["routes"]] == ["RT-03", "RT-01", "RT-05"]
+    assert d["routes"][0]["usable"] is False
+    assert "TM-01" in {t["id"] for t in d["available_teams"]}
+    assert "TM-05" not in {t["id"] for t in d["available_teams"]}  # deployed
+
+
+def test_situation_report_filters_teams_by_required_skill(tools: dict[str, BaseTool]) -> None:
+    res = run_tool(tools["situation_report"], {"ward_id": "W-12", "resource": "medicine_kit"})
+    assert res.data["required_skill"] == "medical"
+    assert {t["id"] for t in res.data["available_teams"]} == {"TM-04"}
+
+
+def test_situation_report_unknown_ward_is_an_observation(tools: dict[str, BaseTool]) -> None:
+    res = run_tool(tools["situation_report"], {"ward_id": "W-99", "resource": "blanket"})
+    assert not res.ok

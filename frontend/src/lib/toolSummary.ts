@@ -4,6 +4,7 @@ import { humanize, qty, wardName } from './format'
 type Json = Record<string, unknown>
 
 const TOOL_LABEL: Record<string, string> = {
+  situation_report: 'Situation report',
   stock_lookup: 'Check stock',
   road_status: 'Check roads',
   list_teams: 'Find teams',
@@ -20,6 +21,8 @@ export function toolLabel(name: string): string {
 /** One line describing what the agent asked for. */
 export function describeArgs(name: string, args: Json): string {
   switch (name) {
+    case 'situation_report':
+      return `${humanize(String(args.resource ?? ''))} for ${wardName(String(args.ward_id ?? ''))}`
     case 'stock_lookup':
       return `${humanize(String(args.resource ?? ''))}${args.depot_id ? ` at ${args.depot_id}` : ', all depots'}`
     case 'road_status':
@@ -45,6 +48,16 @@ export function describeArgs(name: string, args: Json): string {
 export function describeResult(name: string, data: unknown): string {
   const d = (data ?? {}) as Json
   switch (name) {
+    case 'situation_report': {
+      const resource = d.resource as ResourceType
+      const routes = ((d.routes as Json[]) ?? []).map((x) => `${x.id} ${x.status}`)
+      const teams = ((d.available_teams as Json[]) ?? []).map((t) => t.id)
+      return [
+        `${qty(Number(d.total_available ?? 0), resource)} available`,
+        routes.length ? `routes ${routes.join(', ')}` : String(d.message ?? 'no routes'),
+        teams.length ? `teams ${teams.join(', ')}` : 'no available team',
+      ].join('. ')
+    }
     case 'stock_lookup': {
       const depots = (d.depots as Json[]) ?? []
       const resource = d.resource as ResourceType

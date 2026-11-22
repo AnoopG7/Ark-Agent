@@ -2,8 +2,9 @@
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
-from pydantic import Field, SecretStr
+from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -25,6 +26,8 @@ class Settings(BaseSettings):
     llm_temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     llm_timeout_s: float = Field(default=60.0, gt=0)
     llm_max_retries: int = Field(default=3, ge=0, le=10)
+    llm_reasoning_effort: Literal["low", "medium", "high"] | None = "low"
+    """For reasoning models (gpt-oss): less hidden reasoning means fewer tokens and faster steps."""
 
     # --- Database --------------------------------------------------------------------------
     database_url: str = "postgresql+psycopg://ark:ark@localhost:5432/ark"
@@ -42,6 +45,11 @@ class Settings(BaseSettings):
 
     # --- API -------------------------------------------------------------------------------
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:8080"]
+
+    @field_validator("llm_reasoning_effort", mode="before")
+    @classmethod
+    def _blank_effort_means_none(cls, v: object) -> object:
+        return None if v == "" else v
 
     @property
     def psycopg_url(self) -> str:

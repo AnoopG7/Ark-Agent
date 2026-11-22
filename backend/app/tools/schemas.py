@@ -20,6 +20,11 @@ class RoadStatusArgs(DomainModel):
     route_id: RouteId | None = Field(default=None, description="A single route id such as RT-03")
 
 
+class SituationReportArgs(DomainModel):
+    ward_id: WardId = Field(description="Ward id such as W-07 (Ward 7)")
+    resource: ResourceType = Field(description="Resource the ward needs")
+
+
 class ListTeamsArgs(DomainModel):
     skill: TeamSkill | None = Field(default=None, description="Only teams with this skill")
     status: TeamStatus | None = Field(

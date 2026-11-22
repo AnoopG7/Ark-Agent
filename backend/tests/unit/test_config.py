@@ -32,3 +32,11 @@ def test_invalid_max_steps_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_psycopg_url_strips_sqlalchemy_driver() -> None:
     s = Settings(_env_file=None, database_url="postgresql+psycopg://u:p@h:5432/d")
     assert s.psycopg_url == "postgresql://u:p@h:5432/d"
+
+
+def test_reasoning_effort_defaults_low_and_blank_disables(monkeypatch) -> None:
+    from app.core.config import Settings
+
+    assert Settings(_env_file=None).llm_reasoning_effort == "low"
+    monkeypatch.setenv("LLM_REASONING_EFFORT", "")
+    assert Settings(_env_file=None).llm_reasoning_effort is None

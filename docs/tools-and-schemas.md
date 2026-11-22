@@ -28,6 +28,7 @@ run crashing.
 
 | Tool | Arguments | Returns | Side effects |
 |------|-----------|---------|--------------|
+| `situation_report` | `ward_id`, `resource` | ward, available stock per depot, every route to the ward (status, time, vehicle, `usable`), required skill, available teams with it; one call instead of three | none |
 | `stock_lookup` | `resource`, `depot_id?` | per-depot quantity / reserved / available, total available | none |
 | `road_status` | `ward_id?`, `route_id?` | routes sorted by travel time with `usable` flag; message if no route reaches the ward | none |
 | `list_teams` | `skill?`, `status?` (default available) | teams with skills, vehicle, base | none |
