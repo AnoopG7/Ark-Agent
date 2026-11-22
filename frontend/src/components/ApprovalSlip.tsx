@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { RESOURCE_LABEL, minutes, num, qty, wardName } from '../lib/format'
+import { amountOf, minutes, num, qty, wardName } from '../lib/format'
 import type { Decision, PendingApproval } from '../types/api'
 
 interface Props {
@@ -28,7 +28,7 @@ export function ApprovalSlip({ pending, busy, onDecide }: Props) {
 
       <div className="space-y-4 p-4">
         <p className="display text-xl font-[650] leading-snug">
-          {qty(plan.total_allocated, plan.resource)} of {RESOURCE_LABEL[plan.resource].toLowerCase()} for{' '}
+          {amountOf(plan.total_allocated, plan.resource)} for{' '}
           {num(plan.people)} people
         </p>
 

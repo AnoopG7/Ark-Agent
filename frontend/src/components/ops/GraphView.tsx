@@ -23,7 +23,8 @@ export function GraphView() {
         })
         const { svg } = await mermaid.render('ark-graph', source)
         if (!cancelled && ref.current) ref.current.innerHTML = svg
-      } catch {
+      } catch (err) {
+        console.error('[GraphView] could not render graph', err)
         if (!cancelled) setFailed(true)
       }
     })()

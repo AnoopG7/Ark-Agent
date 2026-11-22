@@ -32,6 +32,13 @@ export function qty(n: number, resource: ResourceType): string {
   return `${numberFmt.format(n)} ${UNIT_SHORT[UNIT_OF[resource]]}`
 }
 
+/** Amount as a phrase: "800 L of drinking water", "30 medicine kits", "1 boat". */
+export function amountOf(n: number, resource: ResourceType): string {
+  const label = RESOURCE_LABEL[resource].toLowerCase()
+  if (UNIT_OF[resource] === 'litre') return `${numberFmt.format(n)} L of ${label}`
+  return `${numberFmt.format(n)} ${n === 1 ? label.replace(/s$/, '') : label}`
+}
+
 export function num(n: number): string {
   return numberFmt.format(n)
 }
@@ -59,4 +66,16 @@ export function timeAgo(iso: string): string {
 export function humanize(s: string): string {
   const t = s.replace(/_/g, ' ')
   return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
+/**
+ * Strip the Markdown a model sometimes emits despite being asked for plain text, so the chat
+ * shows clean prose. Also turns gpt-oss style 【source】 citations into (source).
+ */
+export function plainText(text: string): string {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/【([^】]*)】/g, ' ($1)')
 }

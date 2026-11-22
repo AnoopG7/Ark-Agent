@@ -65,11 +65,18 @@ export function useAgentThread(onRunFinished: () => void) {
     finished.current = onRunFinished
   }, [onRunFinished])
 
+  // Threads created in this session start empty and are filled by the live stream; only a
+  // thread restored from localStorage needs its history fetched. Re-fetching a fresh thread
+  // would race the stream and wipe the message that was just sent.
+  const createdHere = useRef(new Set<string>())
+
   useEffect(() => {
-    if (!threadId) return
+    if (!threadId || createdHere.current.has(threadId)) return
+    let stale = false
     api
       .getThread(threadId)
       .then((state) => {
+        if (stale) return
         const { chat: c, trace: t } = fromHistory(state.messages)
         setChat(c)
         setTrace(t)
@@ -77,11 +84,15 @@ export function useAgentThread(onRunFinished: () => void) {
         setStatus(state.status)
       })
       .catch(() => undefined)
+    return () => {
+      stale = true
+    }
   }, [threadId])
 
   const ensureThread = useCallback(async () => {
     if (threadId) return threadId
     const { thread_id } = await api.createThread()
+    createdHere.current.add(thread_id)
     localStorage.setItem(STORAGE_KEY, thread_id)
     setThreadId(thread_id)
     return thread_id

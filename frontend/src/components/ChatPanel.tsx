@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react'
 import type { ChatLine } from '../hooks/useAgentThread'
 import type { Decision, PendingApproval } from '../types/api'
+import { plainText } from '../lib/format'
 import { ApprovalSlip } from './ApprovalSlip'
 
 const EXAMPLES = [
@@ -72,7 +73,7 @@ export function ChatPanel({ chat, pending, running, error, onSend, onDecide }: P
                   : 'mr-8 whitespace-pre-wrap rounded-lg bg-white px-3 py-2 ring-1 ring-silt-deep'
             }
           >
-            {line.text}
+            {line.role === 'assistant' ? plainText(line.text) : line.text}
           </div>
         ))}
 
