@@ -41,6 +41,10 @@ def events_from_update(node: str, update: Any, step: int) -> list[AgentEvent]:
         if isinstance(msg, AIMessage):
             text = msg.text if isinstance(msg.text, str) else str(msg.content)
             if msg.tool_calls:
+                # Reasoning models (e.g. gpt-oss on Groq) leave ``content`` empty on tool-call
+                # turns and return their thinking separately; surface it as the step's thought.
+                if not text.strip():
+                    text = str(msg.additional_kwargs.get("reasoning_content") or "")
                 if text.strip():
                     events.append(AgentEvent(type="thought", step=step, data={"text": text}))
                 events.extend(

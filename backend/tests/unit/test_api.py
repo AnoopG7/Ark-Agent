@@ -55,7 +55,7 @@ def test_health_and_reference_data() -> None:
             "status": "ok",
             "database": True,
             "llm_configured": True,
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-120b",
         }
         assert len(client.get("/api/ops/depots").json()) == 3
         assert len(client.get("/api/ops/routes", params={"ward_id": "W-07"}).json()) == 3
@@ -152,3 +152,16 @@ def test_knowledge_search() -> None:
 def test_message_validation(payload) -> None:
     with make_client() as client:
         assert client.post("/api/threads/t1/messages", json=payload).status_code == 422
+
+
+def test_reasoning_content_becomes_thought_when_content_is_empty() -> None:
+    from app.api.streaming import events_from_update
+
+    msg = AIMessage(
+        content="",
+        tool_calls=[{"name": "stock_lookup", "args": {"resource": "water"}, "id": "c1"}],
+        additional_kwargs={"reasoning_content": "Check water stock first."},
+    )
+    events = events_from_update("reason", {"messages": [msg]}, step=1)
+    assert [e.type for e in events] == ["thought", "tool_call"]
+    assert events[0].data["text"] == "Check water stock first."

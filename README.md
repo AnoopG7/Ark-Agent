@@ -19,7 +19,7 @@ A coordinator types *"Ward 7 needs drinking water for 300 people by evening"*. A
 | | |
 |---|---|
 | Agent | LangGraph `StateGraph` (custom ReAct nodes, `interrupt()` human checkpoint, step limit) |
-| LLM | Groq `llama-3.3-70b-versatile` with tool calling |
+| LLM | Groq `openai/gpt-oss-120b` with tool calling |
 | RAG | 9 relief SOPs → heading-aware chunks → local `bge-small-en-v1.5` embeddings → pgvector (HNSW) |
 | Memory | LangGraph `PostgresSaver` (per conversation) + `PostgresStore` (facts across shifts) |
 | Backend | Python 3.12 · uv · FastAPI (SSE) · SQLAlchemy 2 · Alembic · Pydantic v2 |

@@ -20,7 +20,7 @@ flowchart LR
     subgraph db [db container]
         PG[("PostgreSQL 16 + pgvector<br/>ops tables · guideline_chunks<br/>checkpoints · store")]
     end
-    GROQ[[Groq API<br/>llama-3.3-70b-versatile]]
+    GROQ[[Groq API<br/>openai/gpt-oss-120b]]
 
     UI -- "/api" --> NG --> API --> G
     G --> T --> PG

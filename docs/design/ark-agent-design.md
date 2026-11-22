@@ -44,7 +44,7 @@ strong typed schemas, tests, documentation, an evaluation report, and a readable
 
 ## 3. Constraints
 
-- **LLM:** Groq (`GROQ_API_KEY` in `.env`). Default model `llama-3.3-70b-versatile` (strong tool calling),
+- **LLM:** Groq (`GROQ_API_KEY` in `.env`). Default model `openai/gpt-oss-120b` (strong tool calling),
   configurable.
 - **Infrastructure:** Docker Compose with **one PostgreSQL 16 + pgvector** container holding ops data, RAG
   vectors, the LangGraph checkpointer and the long-term store. No separate vector server. In-memory
@@ -336,7 +336,7 @@ runner and the demos.
 
 ## 10. Key design decisions
 
-1. Default model `llama-3.3-70b-versatile` on Groq; switchable via `.env`.
+1. Default model `openai/gpt-oss-120b` on Groq; switchable via `.env`.
 2. One Postgres 16 + pgvector container for all state; no separate vector server.
 3. SQLAlchemy 2.0 (sync, psycopg 3) + Alembic migrations; LangGraph `PostgresSaver` / `PostgresStore`.
 4. Local fastembed embeddings (384-d) running inside the backend; model cached in a Docker volume.

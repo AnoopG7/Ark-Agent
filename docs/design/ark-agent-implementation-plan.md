@@ -12,7 +12,7 @@
 
 - Python env via **uv** only (`backend/.venv`, `uv.lock` committed). Python 3.12.
 - Backend package lives at `backend/app/` (imports `from app...`).
-- LLM: Groq, default `llama-3.3-70b-versatile`, read from `GROQ_MODEL`; key `GROQ_API_KEY`.
+- LLM: Groq, default `openai/gpt-oss-120b`, read from `GROQ_MODEL`; key `GROQ_API_KEY`.
 - One Postgres 16 + pgvector container; no other stateful services.
 - Embeddings: fastembed `BAAI/bge-small-en-v1.5`, dimension **384**.
 - Pydantic v2 models use `ConfigDict(extra="forbid")`. IDs: depots `^DEP-[A-C]$`, routes `^RT-\d{2}$`, teams `^TM-\d{2}$`, wards `^W-\d{2}$` (display name "Ward N").
@@ -41,7 +41,7 @@
 ### Task 2: Configuration
 
 **Files:** `backend/app/core/config.py`, `backend/tests/unit/test_config.py`
-**Produces:** `Settings` (pydantic-settings) with `database_url: str`, `groq_api_key: SecretStr | None`, `groq_model: str = "llama-3.3-70b-versatile"`, `max_steps: int = 8` (ge=1, le=25), `rag_top_k: int = 3`, `rag_min_score: float = 0.35`, `embedding_model: str`, `cors_origins: list[str]`; `get_settings() -> Settings` (lru_cache).
+**Produces:** `Settings` (pydantic-settings) with `database_url: str`, `groq_api_key: SecretStr | None`, `groq_model: str = "openai/gpt-oss-120b"`, `max_steps: int = 8` (ge=1, le=25), `rag_top_k: int = 3`, `rag_min_score: float = 0.35`, `embedding_model: str`, `cors_origins: list[str]`; `get_settings() -> Settings` (lru_cache).
 
 - [ ] Tests: defaults; env override `MAX_STEPS=3`; `MAX_STEPS=0` raises `ValidationError`.
 - [ ] Commit `feat(config): add typed settings loaded from environment`.
