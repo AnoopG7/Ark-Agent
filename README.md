@@ -63,6 +63,7 @@ docs/       design, architecture, graph, memory, RAG, database, API, evaluation,
 
 ## Documentation
 
+- [Project guide: everything explained](docs/project-guide.md)
 - [Design document](docs/design/ark-agent-design.md) and [implementation plan](docs/design/ark-agent-implementation-plan.md)
 - [Architecture](docs/architecture.md) · [Agent graph](docs/graph.md) · [Memory](docs/memory.md) · [RAG](docs/rag.md)
 - [Database](docs/database.md) · [Tools and schemas](docs/tools-and-schemas.md) · [HTTP API](docs/api.md)
