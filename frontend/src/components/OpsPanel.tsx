@@ -22,8 +22,8 @@ export function OpsPanel({ data, onRouteChange, onClearMemory }: Props) {
   const blocked = data.routes.filter((r) => r.status === 'blocked').length
 
   return (
-    <section className="panel flex min-h-[32rem] flex-col" aria-label="Operations">
-      <div role="tablist" className="flex flex-wrap gap-1 border-b border-silt-deep px-2 pt-2">
+    <section className="panel panel-tall flex flex-col" aria-label="Operations">
+      <div role="tablist" className="flex shrink-0 flex-wrap gap-1 border-b border-silt-deep px-2 pt-2">
         {TABS.map((t) => (
           <button
             key={t}
@@ -45,7 +45,7 @@ export function OpsPanel({ data, onRouteChange, onClearMemory }: Props) {
           </button>
         ))}
       </div>
-      <div role="tabpanel" className="flex-1 overflow-y-auto p-4">
+      <div role="tabpanel" className="min-h-0 flex-1 overflow-y-auto p-4">
         {tab === 'Depots' && <DepotsView depots={data.depots} />}
         {tab === 'Roads' && <RoutesView routes={data.routes} onChange={onRouteChange} />}
         {tab === 'Teams' && <TeamsView teams={data.teams} />}

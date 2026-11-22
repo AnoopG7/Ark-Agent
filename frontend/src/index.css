@@ -65,6 +65,17 @@
     border-radius: var(--radius-panel);
   }
 
+  /* Fixed-height panel: its body scrolls instead of stretching the page. On wide screens the
+     three panels fill the viewport below the header. */
+  .panel-tall {
+    height: 36rem;
+  }
+  @media (min-width: 64rem) {
+    .panel-tall {
+      height: max(30rem, calc(100dvh - 8rem));
+    }
+  }
+
   .btn {
     display: inline-flex;
     align-items: center;

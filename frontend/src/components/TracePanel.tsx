@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { TraceStep } from '../hooks/useAgentThread'
 import { describeArgs, describeResult, toolLabel } from '../lib/toolSummary'
 import type { RunStatus } from '../types/api'
@@ -18,9 +19,23 @@ interface Props {
 }
 
 export function TracePanel({ trace, status, maxSteps = 8 }: Props) {
+  const listRef = useRef<HTMLOListElement>(null)
+  // Follow new steps while the reader is at the bottom; leave them alone if they scrolled up.
+  const followRef = useRef(true)
+
+  useEffect(() => {
+    const el = listRef.current
+    if (el && followRef.current) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }, [trace])
+
+  const onScroll = () => {
+    const el = listRef.current
+    if (el) followRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48
+  }
+
   return (
-    <section className="panel flex min-h-[32rem] flex-col" aria-label="Agent reasoning">
-      <div className="flex items-baseline justify-between border-b border-silt-deep px-4 py-3">
+    <section className="panel panel-tall flex flex-col" aria-label="Agent reasoning">
+      <div className="flex shrink-0 items-baseline justify-between gap-3 border-b border-silt-deep px-4 py-3">
         <h2 className="display text-lg font-[650]">How Ark is planning</h2>
         <span className="text-sm text-ink-soft tabular" aria-live="polite">
           {trace.length > 0 && `Step ${trace.length} of ${maxSteps}. `}
@@ -33,7 +48,7 @@ export function TracePanel({ trace, status, maxSteps = 8 }: Props) {
           Each step appears here as Ark reasons, calls a tool and reads the result.
         </p>
       ) : (
-        <ol className="waterline flex-1 space-y-5 overflow-y-auto px-4 py-5">
+        <ol ref={listRef} onScroll={onScroll} className="waterline min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-5">
           {trace.map((step) => (
             <li key={step.step} className="relative pl-11">
               <span

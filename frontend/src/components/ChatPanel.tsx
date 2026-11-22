@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { type FormEvent, type KeyboardEvent, useEffect, useRef, useState } from 'react'
 import type { ChatLine } from '../hooks/useAgentThread'
 import type { Decision, PendingApproval } from '../types/api'
 import { plainText } from '../lib/format'
@@ -22,6 +22,15 @@ interface Props {
 export function ChatPanel({ chat, pending, running, error, onSend, onDecide }: Props) {
   const [text, setText] = useState('')
   const endRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Grow the request box with its text (up to about six lines, then it scrolls).
+  useEffect(() => {
+    const el = inputRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`
+  }, [text])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
@@ -35,11 +44,16 @@ export function ChatPanel({ chat, pending, running, error, onSend, onDecide }: P
     setText('')
   }
 
-  return (
-    <section className="panel flex min-h-[32rem] flex-col" aria-label="Conversation">
-      <h2 className="display border-b border-silt-deep px-4 py-3 text-lg font-[650]">Requests</h2>
+  // Enter sends; Shift+Enter adds a new line.
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) submit(e)
+  }
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+  return (
+    <section className="panel panel-tall flex flex-col" aria-label="Conversation">
+      <h2 className="display shrink-0 border-b border-silt-deep px-4 py-3 text-lg font-[650]">Requests</h2>
+
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {chat.length === 0 && (
           <div className="space-y-3">
             <p className="text-ink-soft">
@@ -87,18 +101,21 @@ export function ChatPanel({ chat, pending, running, error, onSend, onDecide }: P
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={submit} className="flex gap-2 border-t border-silt-deep p-3">
+      <form onSubmit={submit} className="flex shrink-0 items-end gap-2 border-t border-silt-deep p-3">
         <label htmlFor="request" className="sr-only">
           Relief request
         </label>
-        <input
+        <textarea
           id="request"
+          ref={inputRef}
+          rows={1}
           value={text}
           onChange={(e) => setText(e.target.value)}
+          onKeyDown={onKeyDown}
           placeholder={pending ? 'Decide on the dispatch above first' : 'Ward 7 needs drinking water for 300 people'}
           disabled={Boolean(pending)}
           maxLength={2000}
-          className="flex-1 rounded-md border border-silt-deep bg-white px-3 py-2 disabled:bg-silt"
+          className="min-w-0 flex-1 resize-none overflow-y-auto rounded-md border border-silt-deep bg-white px-3 py-2 leading-snug break-words disabled:bg-silt"
         />
         <button type="submit" className="btn btn-primary" disabled={running || !text.trim() || Boolean(pending)}>
           Send
