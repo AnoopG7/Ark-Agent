@@ -20,8 +20,10 @@ export default function App() {
     [ops],
   )
 
+  // A fresh demo world: seed stock, routes and teams, no dispatches, and no remembered facts
+  // about dispatches that no longer exist.
   const reset = useCallback(async () => {
-    await api.reset()
+    await Promise.all([api.reset(), api.clearMemory()])
     agent.newConversation()
     await ops.refresh()
   }, [agent, ops])

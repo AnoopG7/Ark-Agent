@@ -138,6 +138,7 @@ for Ward 7 fails (blocked road) and Ward 12 medicine can't be fully covered.
 | Tool | What the agent uses it for | Changes data? |
 |------|----------------------------|---------------|
 | `search_guidelines` | RAG search of the SOPs; returns passages + citations | No |
+| `situation_report` | One call with stock per depot, every route to the ward and suitable available teams (the usual first lookup) | No |
 | `stock_lookup` | Stock per depot for a resource (quantity, reserved, available) | No |
 | `road_status` | Routes to a ward, sorted by time, with a `usable` flag | No |
 | `list_teams` | Available teams, filter by skill | No |
@@ -164,13 +165,13 @@ route; the plan cites a guideline that was actually retrieved.
    Events stream**, so each step appears live.
 2. `load_memory` finds nothing about Ward 7 yet.
 3. **Step 1:** LLM calls `search_guidelines` → 3 L/person/day → needs 900 L.
-4. **Step 2:** `stock_lookup` → A 800, B 1,500, C 600.
-5. **Step 3:** `road_status` for W-07 → RT-03 blocked, RT-01 open, RT-05 slow.
-6. **Step 4:** `list_teams` (logistics) → TM-01, TM-02, TM-06, TM-08.
-7. **Step 5:** LLM calls `create_dispatch_task` → validator passes → **interrupt**. Slip appears.
-8. Coordinator approves → Postgres transaction locks the stock rows (`SELECT ... FOR UPDATE`),
+4. **Step 2:** `situation_report` for W-07 → stock A 800, B 1,500, C 600; RT-03 blocked, RT-01
+   open, RT-05 slow; available teams.
+5. **Step 3:** LLM calls `create_dispatch_task` (800 L from DEP-A + 100 L from DEP-C) → validator
+   passes → **interrupt**. Slip appears.
+6. Coordinator approves → Postgres transaction locks the stock rows (`SELECT ... FOR UPDATE`),
    reserves stock, sets the team to deployed, creates `TASK-0001`, and saves facts to memory.
-9. `finalize_plan` writes "Approved and dispatched...". Depot bars turn amber for the reserved part.
+7. `finalize_plan` writes "Approved and dispatched...". Depot bars turn amber for the reserved part.
 
 The step limit (default 8) stops a confused agent from looping forever; if reached, Ark says
 what it found so far and stops (scenario S4).
@@ -181,7 +182,7 @@ what it found so far and stops (scenario S4).
 
 **Header:** green dots show the database is connected and which LLM is configured.
 *New conversation* starts a fresh thread (long-term memory is kept). *Reset demo data* restores
-seed stock, routes and teams and clears dispatches (memory and the RAG index are kept).
+seed stock, routes and teams and clears dispatches and long-term memory (the RAG index is kept).
 
 **Left: Requests (chat).** Type a request or click an example to fill the box. Shows your
 messages, Ark's answers, decision notes, and the **dispatch slip** when approval is needed:
@@ -271,6 +272,11 @@ Other: `migrations/` (database schema versions), `scripts/` (demos and evaluatio
 - **Retries:** Groq rate limits and malformed tool calls are retried with exponential backoff;
   an empty model turn is re-asked.
 - **Step limit:** stops runaway loops.
+- **Speed:** every step resends the whole conversation, so tokens grow with each step and the
+  free Groq tier (8,000 tokens/minute) is the bottleneck, not the model (each call takes ~0.5 s).
+  We cut a plan from ~7 steps to ~3 with the combined `situation_report` tool, set gpt-oss
+  reasoning effort to low, and tell the model never to repeat a call. A paid Groq tier (much
+  higher token limit) would bring a run down to a few seconds without code changes.
 - **Tests:** 121 offline unit tests (fake scripted LLM, in-memory storage) and 25 integration
   tests on real Postgres. One contract test suite runs against both repository implementations
   so they behave identically.
@@ -324,13 +330,13 @@ Terminal demos (from `backend/`): `uv run python -m scripts.demo_approval`,
 Tests: `uv run pytest` and `uv run pytest -m integration`.
 
 Free Groq limit: 8,000 tokens/minute. If a run seems to pause for ~20 s, it is waiting out the
-rate limit and will continue on its own.
+rate limit and will continue on its own. See §8 for why a run takes ~45 s and how to speed it up.
 
 ---
 
 ## 11. Demo video script (about 5 minutes)
 
-Before recording: *Reset demo data*, *New conversation*, Memory tab → *Clear memory*.
+Before recording: *Reset demo data* (also clears memory) and *New conversation*.
 
 | # | Do | Say |
 |---|----|-----|
