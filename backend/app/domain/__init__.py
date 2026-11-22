@@ -12,6 +12,8 @@ from app.domain.enums import (
     TeamStatus,
     Unit,
     VehicleType,
+    describe_amount,
+    resource_name,
 )
 from app.domain.memory import MemoryFact
 from app.domain.plan import Allocation, ReliefPlan
@@ -24,6 +26,8 @@ from app.domain.ward import Ward
 
 __all__ = [
     "RESOURCE_UNITS",
+    "describe_amount",
+    "resource_name",
     "Allocation",
     "Depot",
     "DispatchTask",

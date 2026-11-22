@@ -18,7 +18,15 @@ from app.agent.llm import invoke_with_retry
 from app.agent.prompts import render_system_prompt
 from app.agent.state import AgentState, ApprovalDecision
 from app.agent.validator import validate_plan
-from app.domain import DispatchTask, FactKind, MemoryFact, ReliefPlan, ToolResult
+from app.domain import (
+    DispatchTask,
+    FactKind,
+    MemoryFact,
+    ReliefPlan,
+    ToolResult,
+    describe_amount,
+    resource_name,
+)
 from app.memory.facts import FactsService
 from app.repositories.errors import RepositoryError
 from app.repositories.interfaces import OpsRepository
@@ -59,6 +67,21 @@ def retrieved_citations(messages: list) -> set[str]:
     return found
 
 
+EMPTY_REPLY_RETRIES = 2
+EMPTY_REPLY_NUDGE = (
+    "Your previous reply was empty. Continue the task: call the next tool you need, "
+    "or reply to the coordinator in plain text."
+)
+EMPTY_REPLY_FALLBACK = (
+    "I could not finish planning this request. Please rephrase it or send it again."
+)
+
+
+def _is_substantive(msg: AIMessage) -> bool:
+    """True when the model produced a tool call or visible text."""
+    return bool(msg.tool_calls) or bool(str(msg.text).strip())
+
+
 def _tool_message(call: dict, result: ToolResult) -> ToolMessage:
     return ToolMessage(
         content=result.model_dump_json(),
@@ -75,7 +98,8 @@ def _thread_id(config: RunnableConfig) -> str | None:
 def describe_task(task: DispatchTask) -> str:
     p = task.plan
     legs = "; ".join(
-        f"{a.quantity} {p.resource} from {a.depot_id} via {a.route_id}" for a in p.allocations
+        f"{describe_amount(a.quantity, p.resource)} from {a.depot_id} via {a.route_id}"
+        for a in p.allocations
     )
     return (
         f"{task.id} dispatched to {p.ward_id} for {p.people} people: {legs}. Team {p.team_id}, "
@@ -130,7 +154,17 @@ class AgentNodes:
                 self.max_steps_for(config), state.get("memory_context", ""), self.clock()
             )
         )
-        response = invoke_with_retry(self._bound, [system, *state["messages"]])
+        prompt = [system, *state["messages"]]
+        response = invoke_with_retry(self._bound, prompt)
+        # Reasoning models occasionally end a turn with neither a tool call nor any visible
+        # text (the step stays inside their hidden reasoning). Re-ask with a nudge rather than
+        # treating silence as the final answer. The nudge is not stored in the thread.
+        for _ in range(EMPTY_REPLY_RETRIES):
+            if _is_substantive(response):
+                break
+            response = invoke_with_retry(self._bound, [*prompt, HumanMessage(EMPTY_REPLY_NUDGE)])
+        if not _is_substantive(response):
+            response = AIMessage(content=EMPTY_REPLY_FALLBACK, id=response.id)
         return {"messages": [response], "step_count": state.get("step_count", 0) + 1}
 
     # ---- tools ---------------------------------------------------------------------------
@@ -219,9 +253,9 @@ class AgentNodes:
         task = self.repo.record_rejection(plan, note=decision.note, thread_id=thread)
         self._remember(
             FactKind.REJECTION,
-            f"Plan for {plan.ward_id} ({plan.resource}, team {plan.team_id}) was "
+            f"Plan for {plan.ward_id} ({resource_name(plan.resource)}, team {plan.team_id}) was "
             f"{'sent back for revision' if decision.decision == 'revise' else 'rejected'}: "
-            f"{decision.note or 'no reason given'}.",
+            f"{(decision.note or 'no reason given').rstrip('.')}.",
             plan.ward_id,
             thread,
         )
@@ -257,7 +291,8 @@ class AgentNodes:
         for a in p.allocations:
             self._remember(
                 FactKind.RESERVATION,
-                f"{a.depot_id} reserved {a.quantity} {p.resource} for {p.ward_id} ({task.id}).",
+                f"{a.depot_id} reserved {describe_amount(a.quantity, p.resource)} "
+                f"for {p.ward_id} ({task.id}).",
                 p.ward_id,
                 thread,
             )
@@ -290,7 +325,8 @@ class AgentNodes:
             task = DispatchTask.model_validate(state["dispatched_task"])
             text = f"Approved and dispatched. {describe_task(task)}"
             if task.plan.shortfall:
-                text += f" Shortfall: {task.plan.shortfall} {task.plan.resource} still needed."
+                missing = describe_amount(task.plan.shortfall, task.plan.resource)
+                text += f" Shortfall: {missing} still needed."
             return {"messages": [AIMessage(content=text)]}
 
         if status == "rejected":

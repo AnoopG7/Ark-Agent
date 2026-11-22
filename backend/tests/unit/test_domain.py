@@ -179,3 +179,11 @@ class TestTaskFactAndToolResult:
             ToolResult(ok=True, error="contradiction")
         with pytest.raises(ValidationError):
             ToolResult(ok=False)
+
+
+def test_describe_amount_uses_units_and_plurals() -> None:
+    from app.domain import ResourceType, describe_amount
+
+    assert describe_amount(800, ResourceType.DRINKING_WATER) == "800 L of drinking water"
+    assert describe_amount(30, ResourceType.MEDICINE_KIT) == "30 medicine kits"
+    assert describe_amount(1, ResourceType.BOAT) == "1 boat"

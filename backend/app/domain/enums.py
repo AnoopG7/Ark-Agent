@@ -31,6 +31,19 @@ RESOURCE_UNITS: dict[ResourceType, Unit] = {
 """The canonical unit each resource is counted in."""
 
 
+def resource_name(resource: ResourceType) -> str:
+    """Human-readable name, e.g. ``drinking_water`` -> ``drinking water``."""
+    return ResourceType(resource).value.replace("_", " ")
+
+
+def describe_amount(quantity: int, resource: ResourceType) -> str:
+    """Quantity with its unit, e.g. ``800 L of drinking water`` or ``30 medicine kits``."""
+    name = resource_name(resource)
+    if RESOURCE_UNITS[ResourceType(resource)] is Unit.LITRE:
+        return f"{quantity} L of {name}"
+    return f"{quantity} {name}{'' if quantity == 1 else 's'}"
+
+
 class RouteStatus(StrEnum):
     OPEN = "open"
     SLOW = "slow"

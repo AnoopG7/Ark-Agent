@@ -228,7 +228,7 @@ def test_long_term_facts_injected_into_prompt(repo, store, retriever) -> None:
     graph2, llm2 = make_graph([AIMessage(content="ok")], repo, store, retriever)
     ask(graph2, "Anything already sent to Ward 7?", thread="shift-2")
     system_prompt = llm2.prompts[0][0].content
-    assert "DEP-A reserved 800 drinking_water for W-07" in system_prompt
+    assert "DEP-A reserved 800 L of drinking water for W-07" in system_prompt
 
 
 def test_diagram_contains_all_nodes_and_edges() -> None:
@@ -247,3 +247,25 @@ def test_diagram_contains_all_nodes_and_edges() -> None:
         "finalize_plan --> __end__",
     ):
         assert edge in mermaid
+
+
+def test_empty_reply_is_retried_with_nudge(repo, store, retriever) -> None:
+    graph, llm = make_graph(
+        [ai(call("road_status", ward_id="W-07")), ai(), AIMessage(content="RT-03 is blocked.")],
+        repo,
+        store,
+        retriever,
+    )
+    out = ask(graph, "Is the road to Ward 7 open?")
+    assert out["messages"][-1].content == "RT-03 is blocked."
+    assert out["step_count"] == 2  # the retry is part of the same step
+    assert "previous reply was empty" in str(llm.prompts[-1][-1].content)
+    # the nudge is never persisted in the thread
+    assert not any("previous reply was empty" in str(m.content) for m in out["messages"])
+
+
+def test_persistently_empty_reply_falls_back_to_message(repo, store, retriever) -> None:
+    graph, _ = make_graph([ai(), ai(), ai()], repo, store, retriever)
+    out = ask(graph, "Is the road to Ward 7 open?")
+    assert out["status"] == "answered"
+    assert "could not finish" in out["messages"][-1].content
